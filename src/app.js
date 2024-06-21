@@ -1,57 +1,173 @@
-//This is the Express Application
 const express = require("express");
+const bodyParser = require("body-parser");
+const connectDB = require("../db/conn")  
 
-//Current Directory (.): Parent Directory (..):
-//no require of .js extension
-require("../db/conn")  // The behavior of require() in this case typically involves executing the code within the conn.js file (or whatever module is located at "../db/conn"), but it does not return a value explicitly assigned to a variable. Instead, it might define or execute certain configurations or establish connections (like connecting to a database in this case) that are needed globally in your application.
-const Student = require("../models/students"); //When you import it this way, you are explicitly assigning the exported value (in this case, the Mongoose model) to a variable (Student) that you can then use in your code to interact with the MongoDB collection.
 
-const app = express(); //app got the functions of express
-const port = process.env.PORT || 3000; // port = HostServer || LocalServer
-app.use(express.json());
+const Admin = require("../models/admin");
+const User = require("../models/user");
+const Dealership = require("../models/dealership");
+const Deal = require("../models/deal");
+const Car = require("../models/car");
+const SoldVehicle = require("../models/soldVehicle");
 
-    
+const app = express(); 
+const port = process.env.PORT || 3000; 
 
-// app.get("/", (req,res) => {
-//     res.send("hello from this sides by Gaurav Meena"); //server give this response
-// })
+// Middleware
+app.use(bodyParser.json());
 
-// create a new students
-app.post("/students", (req,res) => {
-    console.log("Request received at /students"); // Debugging statement
-    console.log(req.body); 
+// Database Connection
+connectDB();
 
-    
-    const user = new Student(req.body); //SAnything int HTTP request, post will be add into this collection(Student) captialise+singular database name
-    //You DO NOT NEED express.json() and express.urlencoded() for GET Request or Delete Requests.
-//We only need it for post and put request.
+//-----------------Admin Routes------------------   
+// Create Admin
+app.post("/admin", async (req, res) => {
+    try {
+        const admin = new Admin(req.body);
+        const createdAdmin = await admin.save();
+        res.status(201).json(createdAdmin);
+    } catch (error) {
+        console.error("Error creating admin:", error);
+        res.status(400).json({ message: "Failed to create admin", error: error.message });
+    }
+});
 
-//express.json() is a method inbuilt in express to recognize the incoming Request Object as a JSON Object.
-//This method is called as a middleware
-// in your applicaion using the code: app.use(express.json());
+// Get All Admins
+app.get("/admin", async (req, res) => {
+    try {
+        const admins = await Admin.find();
+        res.json(admins);
+    } catch (error) {
+        console.error("Error fetching admins:", error);
+        res.status(500).json({ message: "Failed to fetch admins", error: error.message });
+    }
+});
 
-    /*{
-        "name": "Gaurav Meena",
-        "email": "gaurav28.official@gmail.com",
-        "phone": 7836977520,
-        "address": "New Delhi"
-    }*/
-        //It is a promise
+//-------------------User Routes----------------
 
-        
-        user.save().then(()=>{ //save to database 
+// Create User
+app.post("/user", async (req, res) => {
+    try {
+        const user = new User(req.body);
+        const createdUser = await user.save();
+        res.status(201).json(createdUser);
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(400).json({ message: "Failed to create user", error: error.message });
+    }
+});
 
-            //http response 200:ok, 201:created, 400:bad request 
-            res.status(201).send(user); //in place of res.send(user);
-        }).catch((e)=>{ //catch error
-            res.status(400).send(e); //send error
-        })
+// Get All Users
+app.get("/user", async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ message: "Failed to fetch users", error: error.message });
+    }
+});
 
-    //res.send("hello from this sides"); //server give this response
-})
-  
+//----------------Car Routes---------
+
+// Create Car
+app.post("/car", async (req, res) => {
+    try {
+        const car = new Car(req.body);
+        const createdCar = await car.save();
+        res.status(201).json(createdCar);
+    } catch (error) {
+        console.error("Error creating car:", error);
+        res.status(400).json({ message: "Failed to create car", error: error.message });
+    }
+});
+
+// Get All Cars
+app.get("/car", async (req, res) => {
+    try {
+        const cars = await Car.find();
+        res.json(cars);
+    } catch (error) {
+        console.error("Error fetching cars:", error);
+        res.status(500).json({ message: "Failed to fetch cars", error: error.message });
+    }
+});
+
+//-----------------Deal Routes--------
+// Create Deal
+app.post("/deal", async (req, res) => {
+    try {
+        const deal = new Deal(req.body);
+        const createdDeal = await deal.save();
+        res.status(201).json(createdDeal);
+    } catch (error) {
+        console.error("Error creating deal:", error);
+        res.status(400).json({ message: "Failed to create deal", error: error.message });
+    }
+});
+
+// Get All Deals
+app.get("/deal", async (req, res) => {
+    try {
+        const deals = await Deal.find();
+        res.json(deals);
+    } catch (error) {
+        console.error("Error fetching deals:", error);
+        res.status(500).json({ message: "Failed to fetch deals", error: error.message });
+    }
+});
+
+//----------Dealership Routes---------
+
+// Create Dealership
+app.post("/dealership", async (req, res) => {
+    try {
+        const dealership = new Dealership(req.body);
+        const createdDealership = await dealership.save();
+        res.status(201).json(createdDealership);
+    } catch (error) {
+        console.error("Error creating dealership:", error);
+        res.status(400).json({ message: "Failed to create dealership", error: error.message });
+    }
+});
+
+// Get All Dealerships
+app.get("/dealership", async (req, res) => {
+    try {
+        const dealerships = await Dealership.find();
+        res.json(dealerships);
+    } catch (error) {
+        console.error("Error fetching dealerships:", error);
+        res.status(500).json({ message: "Failed to fetch dealerships", error: error.message });
+    }
+});
+
+//---------------SoldVehicle Routes-------
+
+// Create Sold Vehicle
+app.post("/soldvehicle", async (req, res) => {
+    try {
+        const soldVehicle = new SoldVehicle(req.body);
+        const createdSoldVehicle = await soldVehicle.save();
+        res.status(201).json(createdSoldVehicle);
+    } catch (error) {
+        console.error("Error creating sold vehicle:", error);
+        res.status(400).json({ message: "Failed to create sold vehicle", error: error.message });
+    }
+});
+
+// Get All Sold Vehicles
+app.get("/soldvehicle", async (req, res) => {
+    try {
+        const soldVehicles = await SoldVehicle.find();
+        res.json(soldVehicles);
+    } catch (error) {
+        console.error("Error fetching sold vehicles:", error);
+        res.status(500).json({ message: "Failed to fetch sold vehicles", error: error.message });
+    }
+});
+
+//Server Listen
 app.listen(port , ()=>{
-    console.log(`Connection is setup at ${port}`); //n JavaScript, you need to use backticks (`) instead of double quotes (") for string interpolation. i.e to use value of ${port}
-})
-
-
+    console.log(`Server is unning on port ${port}`); 
+});

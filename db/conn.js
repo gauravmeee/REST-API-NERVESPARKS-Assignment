@@ -1,20 +1,35 @@
 const mongoose = require("mongoose");
 
-//establish a connection between a Node.js application and a MongoDB database using Mongoose, an Object Data Modeling (ODM) library for MongoDB and Node.js. Here's a detailed explanation with comments added:
-mongoose.connect("mongodb://localhost:27017/students-api",{ // students-api: The name of the database to connect to. If the database does not exist, MongoDB will create it upon receiving the first write operation.
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect("mongodb://localhost:27017/car-deals-api", {
+            //Options Deprecated
+            //useNewUrlParser: true,
+            //useUnifiedTopology: true,
+            //useCreateIndex: true
+        });
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (err) {
+        console.error(`Error connecting to MongoDB: ${err.message}`);
+        process.exit(1); // Exit process with failure
+    }
+};
 
-//The useCreateIndex option has been deprecated for a while and removed as of the Mongoose 6 release per No More Deprecation Warning Options 1.4k:
-//useNewUrlParser , useUnifiedTopology , useFindAndModify , and useCreateIndex are no longer supported options. Mongoose 6 always behaves as if useNewUrlParser , useUnifiedTopology , and useCreateIndex are true , and useFindAndModify is false .
-//useCreateIndex: true,
-//useNewUrlParser: true,
-//useUnifiedTopology: true,
+module.exports = connectDB;
 
-//this function return a promise
-}).then(()=>{
-    console.log("connection is successful");
-}).catch((error)=>{
+
+//If directly include the connection in "app.js" without using "conn.js"
+/*
+mongoose.connect("mongodb://localhost:27017/car-deals-api", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}).catch((error) => {
     console.error("Error connecting to MongoDB:", error.message);
-    //catch((e)=>{ console.log("No connection");}
-    //or
-    //catch((e)=>{ res.send(e); }
-})
+});
+*/
